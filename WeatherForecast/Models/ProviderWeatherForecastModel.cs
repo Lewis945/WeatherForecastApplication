@@ -1,8 +1,10 @@
 ﻿namespace WeatherForecast.Models
 {
-    public class TemperatureForecastModel
+    public class ProviderWeatherForecastModel
     {
-        public TemperatureScale Scale { get; set; }
+        public string Provider { get; set; }
+
+        public UnitsSystem Units { get; set; }
         public Language Language { get; set; }
         public Coordinates Coordinates { get; set; }
 

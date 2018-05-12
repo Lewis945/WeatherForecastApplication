@@ -1,4 +1,4 @@
-﻿namespace WeatherForecast.Models
+﻿namespace WeatherForecast.Provider.OpenWeatherMap
 {
     public struct OpenWeatherMapResponse
     {

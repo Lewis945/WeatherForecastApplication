@@ -1,4 +1,4 @@
-﻿namespace WeatherForecast.Models
+﻿namespace WeatherForecast.Provider.DarkSky
 {
     public enum DarkSkyLanguage
     {

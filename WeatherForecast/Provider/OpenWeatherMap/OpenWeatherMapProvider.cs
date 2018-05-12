@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using WeatherForecast.Models;
-using WeatherForecastTestApplication.WeatherForecast;
 
-namespace WeatherForecast.Providers
+namespace WeatherForecast.Provider.OpenWeatherMap
 {
     /// <summary>
     /// https://openweathermap.org
@@ -15,15 +12,21 @@ namespace WeatherForecast.Providers
     {
         #region Properties
 
-        protected override string ServiceUri { get; } = "api.openweathermap.org";
+        /// <inheritdoc />
+        public override string ServiceUri { get; } = "http://api.openweathermap.org";
 
-        protected override Dictionary<TemperatureScale, string> TemperatureMappings { get; } =
-            new Dictionary<TemperatureScale, string> {
-                { TemperatureScale.Kelvin, "imperial" },
-                { TemperatureScale.Celsius, "metric" }
+        /// <inheritdoc />
+        public string ServiceName { get; } = Name;
+
+        public static string Name { get; } = "OpenWeatherMap";
+
+        protected override Dictionary<UnitsSystem, string> UnitsSystemMappings { get; } =
+            new Dictionary<UnitsSystem, string> {
+                { UnitsSystem.Imperial, "imperial" },
+                { UnitsSystem.Metric, "metric" }
             };
 
-        protected Dictionary<OpenWeatherLanguage, string> ProviderLanguageMappings { get; } =
+        protected static Dictionary<OpenWeatherLanguage, string> ProviderLanguageMappings { get; } =
            new Dictionary<OpenWeatherLanguage, string> {
                 { OpenWeatherLanguage.Arabic, "ar" },
                 { OpenWeatherLanguage.Bulgarian, "bg" },
@@ -63,13 +66,20 @@ namespace WeatherForecast.Providers
         protected override Dictionary<Language, string> LanguageMappings { get; } =
            new Dictionary<Language, string>
            {
+               { Language.English, ProviderLanguageMappings[OpenWeatherLanguage.English] },
+               { Language.Russian, ProviderLanguageMappings[OpenWeatherLanguage.Russian] },
+               { Language.Ukrainian, ProviderLanguageMappings[OpenWeatherLanguage.Ukrainian] }
            };
 
         #endregion
 
         #region .ctor
 
-        protected OpenWeatherMapProvider(string secretKey) : base(secretKey)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="secretKey"></param>
+        public OpenWeatherMapProvider(string secretKey) : base(secretKey)
         {
         }
 
@@ -77,17 +87,19 @@ namespace WeatherForecast.Providers
 
         #region IWeatherForecastProvider
 
-        public async Task<TemperatureForecastModel> GetTemperatureAsync(double latitude, double longitude,
-            TemperatureScale temperatureScale = TemperatureScale.Kelvin, Language language = Language.English)
+        /// <inheritdoc />
+        public async Task<ProviderWeatherForecastModel> GetWeatherForecastAsync(double latitude, double longitude,
+            UnitsSystem units = UnitsSystem.Imperial, Language language = Language.English)
         {
-            string scale = GetTemperatureScale(temperatureScale);
+            string unitsSystem = GetUnitsSystem(units);
             string languageValue = GetLanguage(language);
 
-            string uri = $"{ServiceUri}/data/2.5/weather?appid={SecretKey}&lat={latitude}&lon={longitude}&units={scale}";
+            string uri = $"{ServiceUri}/data/2.5/weather?appid={SecretKey}&lat={latitude}&lon={longitude}&" +
+                $"units={unitsSystem}&lang={languageValue}";
 
             var data = await GetResponseAsync<OpenWeatherMapResponse>(uri).ConfigureAwait(false);
 
-            return new TemperatureForecastModel
+            return new ProviderWeatherForecastModel
             {
                 Coordinates = new Coordinates
                 {
@@ -102,7 +114,8 @@ namespace WeatherForecast.Providers
                 WindSpeed = data.wind.speed,
                 Summary = data.weather.FirstOrDefault().description,
                 Language = language,
-                Scale = temperatureScale
+                Units = units,
+                Provider = ServiceName
             };
         }
 

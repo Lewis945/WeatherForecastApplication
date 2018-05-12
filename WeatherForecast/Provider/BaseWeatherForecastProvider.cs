@@ -5,9 +5,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using WeatherForecast.Exceptions;
 using WeatherForecast.Models;
 
-namespace WeatherForecast.Providers
+namespace WeatherForecast.Provider
 {
     public abstract class BaseWeatherForecastProvider
     {
@@ -15,9 +16,9 @@ namespace WeatherForecast.Providers
 
         protected string SecretKey { get; }
 
-        protected abstract string ServiceUri { get; }
+        public abstract string ServiceUri { get; }
 
-        protected abstract Dictionary<TemperatureScale, string> TemperatureMappings { get; }
+        protected abstract Dictionary<UnitsSystem, string> UnitsSystemMappings { get; }
         protected abstract Dictionary<Language, string> LanguageMappings { get; }
 
         #endregion
@@ -26,6 +27,9 @@ namespace WeatherForecast.Providers
 
         protected BaseWeatherForecastProvider(string secretKey)
         {
+            if (string.IsNullOrWhiteSpace(secretKey))
+                throw new Exception("Secret key is not specified.");
+
             SecretKey = secretKey;
         }
 
@@ -44,19 +48,19 @@ namespace WeatherForecast.Providers
                 var response = await client.GetAsync(url).ConfigureAwait(false);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    var data = await response.Content.ReadAsStringAsync();
+                    var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     var responseObject = JsonConvert.DeserializeObject<TResponse>(data);
                     return responseObject;
                 }
             }
 
-            throw new Exception("Request has failed.");
+            throw new ResponseRetrievalException("Request has failed.");
         }
 
-        protected string GetTemperatureScale(TemperatureScale temperatureScale)
+        protected string GetUnitsSystem(UnitsSystem units)
         {
-            if (!TemperatureMappings.TryGetValue(temperatureScale, out string temperatureScaleValue))
-                throw new Exception($"Temperature unit is not found for {temperatureScale}. Service: {ServiceUri}.");
+            if (!UnitsSystemMappings.TryGetValue(units, out string temperatureScaleValue))
+                throw new MappingNotFoundException($"Units system is not found for {units}. Service: {ServiceUri}.");
 
             return temperatureScaleValue;
         }
@@ -64,7 +68,7 @@ namespace WeatherForecast.Providers
         protected string GetLanguage(Language language)
         {
             if (!LanguageMappings.TryGetValue(language, out string languageValue))
-                throw new Exception($"Language is not found for {language}. Service: {ServiceUri}.");
+                throw new MappingNotFoundException($"Language is not found for {language}. Service: {ServiceUri}.");
 
             return languageValue;
         }

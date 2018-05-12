@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace WeatherForecastTestApplication
+namespace WeatherForecatRestApi
 {
     public class Program
     {
@@ -19,6 +19,10 @@ namespace WeatherForecastTestApplication
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+                .ConfigureAppConfiguration((c, b) =>
+                {
+                    b.AddJsonFile("appsecrets.json");
+                })
                 .UseStartup<Startup>()
                 .Build();
     }

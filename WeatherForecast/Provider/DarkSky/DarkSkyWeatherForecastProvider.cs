@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WeatherForecast.Models;
-using WeatherForecastTestApplication.WeatherForecast;
 
-namespace WeatherForecast.Providers
+namespace WeatherForecast.Provider.DarkSky
 {
     /// <summary>
     /// https://darksky.net
@@ -14,15 +11,21 @@ namespace WeatherForecast.Providers
     {
         #region Properties
 
-        protected override string ServiceUri { get; } = "https://api.darksky.net";
+        /// <inheritdoc />
+        public override string ServiceUri { get; } = "https://api.darksky.net";
 
-        protected override Dictionary<TemperatureScale, string> TemperatureMappings { get; } =
-           new Dictionary<TemperatureScale, string> {
-                { TemperatureScale.Kelvin, "us" },
-                { TemperatureScale.Celsius, "si" }
+        /// <inheritdoc />
+        public string ServiceName { get; } = Name;
+
+        public static string Name { get; } = "DarkSky";
+
+        protected override Dictionary<UnitsSystem, string> UnitsSystemMappings { get; } =
+           new Dictionary<UnitsSystem, string> {
+                { UnitsSystem.Imperial, "us" },
+                { UnitsSystem.Metric, "si" }
            };
 
-        protected Dictionary<DarkSkyLanguage, string> ProviderLanguageMappings { get; } =
+        protected static Dictionary<DarkSkyLanguage, string> ProviderLanguageMappings { get; } =
            new Dictionary<DarkSkyLanguage, string> {
                 { DarkSkyLanguage.Arabic, "ar" },
                 { DarkSkyLanguage.Azerbaijani, "az" },
@@ -70,13 +73,20 @@ namespace WeatherForecast.Providers
         protected override Dictionary<Language, string> LanguageMappings { get; } =
            new Dictionary<Language, string>
            {
+               { Language.English, ProviderLanguageMappings[DarkSkyLanguage.English] },
+               { Language.Russian, ProviderLanguageMappings[DarkSkyLanguage.Russian] },
+               { Language.Ukrainian, ProviderLanguageMappings[DarkSkyLanguage.Ukrainian] }
            };
 
         #endregion
 
         #region .ctor
 
-        protected DarkSkyWeatherForecastProvider(string secretKey) : base(secretKey)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="secretKey"></param>
+        public DarkSkyWeatherForecastProvider(string secretKey) : base(secretKey)
         {
         }
 
@@ -84,17 +94,19 @@ namespace WeatherForecast.Providers
 
         #region IWeatherForecastProvider
 
-        public async Task<TemperatureForecastModel> GetTemperatureAsync(double latitude, double longitude,
-           TemperatureScale temperatureScale = TemperatureScale.Kelvin, Language language = Language.English)
+        /// <inheritdoc />
+        public async Task<ProviderWeatherForecastModel> GetWeatherForecastAsync(double latitude, double longitude,
+           UnitsSystem units = UnitsSystem.Imperial, Language language = Language.English)
         {
-            string scale = GetTemperatureScale(temperatureScale);
+            string unitsSystem = GetUnitsSystem(units);
             string languageValue = GetLanguage(language);
 
-            string uri = $"{ServiceUri}/forecast/{SecretKey}/{latitude},{longitude}?exclude=currently,minutely,hourly,alerts,flags";
+            string uri = $"{ServiceUri}/forecast/{SecretKey}/{latitude},{longitude}?" +
+                $"exclude=minutely,hourly,daily,alerts,flags&units={unitsSystem}&lang={languageValue}";
 
             var data = await GetResponseAsync<DarkSkyResponse>(uri).ConfigureAwait(false);
 
-            return new TemperatureForecastModel
+            return new ProviderWeatherForecastModel
             {
                 Coordinates = new Coordinates
                 {
@@ -109,7 +121,8 @@ namespace WeatherForecast.Providers
                 WindSpeed = data.currently.windSpeed,
                 Summary = data.currently.summary,
                 Language = language,
-                Scale = temperatureScale
+                Units = units,
+                Provider = ServiceName
             };
         }
 
