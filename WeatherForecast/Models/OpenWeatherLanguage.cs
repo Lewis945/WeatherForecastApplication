@@ -1,0 +1,39 @@
+﻿namespace WeatherForecast.Models
+{
+    public enum OpenWeatherLanguage
+    {
+        Arabic,
+        Bulgarian,
+        Catalan,
+        Czech,
+        German,
+        Greek,
+        English,
+        PersianFarsi,
+        Finnish,
+        French,
+        Galician,
+        Croatian,
+        Hungarian,
+        Italian,
+        Japanese,
+        Korean,
+        Latvian,
+        Lithuanian,
+        Macedonian,
+        Dutch,
+        Polish,
+        Portuguese,
+        Romanian,
+        Russian,
+        Swedish,
+        Slovak,
+        Slovenian,
+        Spanish,
+        Turkish,
+        Ukrainian,
+        Vietnamese,
+        ChineseSimplified,
+        ChineseTraditional
+    }
+}
