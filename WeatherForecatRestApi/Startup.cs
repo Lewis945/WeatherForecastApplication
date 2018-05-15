@@ -13,6 +13,7 @@ using WeatherForecast;
 using WeatherForecast.Provider;
 using WeatherForecast.Provider.DarkSky;
 using WeatherForecast.Provider.OpenWeatherMap;
+using WeatherForecatRestApi.Logging;
 
 namespace WeatherForecatRestApi
 {
@@ -40,7 +41,8 @@ namespace WeatherForecatRestApi
             // *If* you need access to generic IConfiguration this is **required**
             services.AddSingleton(Configuration);
 
-            services.AddScoped<WeatherForecast.Logging.ILogger, WeatherLogger>();
+            services.AddScoped<WeatherForecast.Logging.ILogger, WeatherForecastLogger>(
+                p => new WeatherForecastLogger(p.GetService<ILogger<WeatherForecastLogger>>()));
 
             services.AddScoped(p => new DarkSkyWeatherForecastProvider(
                 p.GetService<IOptions<WeatherForecastSecrets>>().Value.DarkSky));

@@ -46,6 +46,9 @@ namespace WeatherForecast
         public async Task<ServiceWeatherForecastModel> GetWeatherForecastAsync(double latitude, double longitude,
           UnitsSystem units = UnitsSystem.Imperial, Language language = Language.English)
         {
+            _logger.LogInfo($"{nameof(GetWeatherForecastAsync)} was called with the following parameters: " +
+                $"latitude={latitude}, longitude={longitude}, units={units}, language={language}");
+
             var providerWeatherForecasts = new List<ProviderWeatherForecastModel>();
             var avarageValues = new ProviderWeatherForecastModel();
 
