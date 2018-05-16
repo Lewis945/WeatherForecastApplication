@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
-using WeatherForecatRestApi;
 using WeatherForecatRestApi.Models;
 
 namespace WeatherForecastTests
@@ -20,7 +19,7 @@ namespace WeatherForecastTests
         {
             var data = File.ReadAllText(path);
             var config = JsonConvert.DeserializeObject<Dictionary<string, WeatherForecastSecretsModel>>(data);
-            return config[nameof(WeatherForecastSecretsModel)];
+            return config[nameof(WeatherForecastSecretsModel).Replace("Model", string.Empty)];
         }
     }
 }
