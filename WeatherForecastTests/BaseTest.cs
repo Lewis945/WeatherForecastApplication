@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using WeatherForecatRestApi;
+using WeatherForecatRestApi.Models;
 
 namespace WeatherForecastTests
 {
     public class BaseTest
     {
-        protected WeatherForecastSecrets Configuration { get; }
+        protected WeatherForecastSecretsModel Configuration { get; }
 
         public BaseTest()
         {
@@ -15,11 +16,11 @@ namespace WeatherForecastTests
                 "WeatherForecatRestApi", "appsecrets.json"));
         }
 
-        private WeatherForecastSecrets GetConfiguration(string path)
+        private WeatherForecastSecretsModel GetConfiguration(string path)
         {
             var data = File.ReadAllText(path);
-            var config = JsonConvert.DeserializeObject<Dictionary<string, WeatherForecastSecrets>>(data);
-            return config[nameof(WeatherForecastSecrets)];
+            var config = JsonConvert.DeserializeObject<Dictionary<string, WeatherForecastSecretsModel>>(data);
+            return config[nameof(WeatherForecastSecretsModel)];
         }
     }
 }

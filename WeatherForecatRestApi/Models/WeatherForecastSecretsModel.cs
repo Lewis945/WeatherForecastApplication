@@ -1,6 +1,6 @@
-﻿namespace WeatherForecatRestApi
+﻿namespace WeatherForecatRestApi.Models
 {
-    public class WeatherForecastSecrets
+    public class WeatherForecastSecretsModel
     {
         public string OpenWeatherMap { get; set; }
         public string DarkSky { get; set; }

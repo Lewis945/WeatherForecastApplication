@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
+using Microsoft.Extensions.Logging;
 
 namespace WeatherForecatRestApi.Logging
 {
@@ -7,13 +7,13 @@ namespace WeatherForecatRestApi.Logging
     {
         #region Fields
 
-        private readonly Microsoft.Extensions.Logging.ILogger _logger;
+        private readonly ILogger _logger;
 
         #endregion
 
         #region .ctor
 
-        public WeatherForecastLogger(Microsoft.Extensions.Logging.ILogger logger)
+        public WeatherForecastLogger(ILogger logger)
         {
             _logger = logger;
         }

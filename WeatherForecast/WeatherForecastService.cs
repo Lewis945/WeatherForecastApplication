@@ -28,7 +28,7 @@ namespace WeatherForecast
         #region .ctor
 
         /// <summary>
-        /// 
+        /// Instantiates external weather forecast service.
         /// </summary>
         /// <param name="providers"></param>
         /// <param name="logger"></param>
@@ -44,10 +44,10 @@ namespace WeatherForecast
 
         /// <inheritdoc />
         public async Task<ServiceWeatherForecastModel> GetWeatherForecastAsync(double latitude, double longitude,
-          UnitsSystem units = UnitsSystem.Imperial, Language language = Language.English)
+            UnitsSystem units = UnitsSystem.Imperial, Language language = Language.English)
         {
             _logger.LogInfo($"{nameof(GetWeatherForecastAsync)} was called with the following parameters: " +
-                $"latitude={latitude}, longitude={longitude}, units={units}, language={language}");
+                            $"latitude={latitude}, longitude={longitude}, units={units}, language={language}");
 
             var providerWeatherForecasts = new List<ProviderWeatherForecastModel>();
             var avarageValues = new ProviderWeatherForecastModel();
@@ -56,7 +56,8 @@ namespace WeatherForecast
             {
                 try
                 {
-                    var providerWeatherForecast = await provider.GetWeatherForecastAsync(latitude, longitude, units, language);
+                    var providerWeatherForecast =
+                        await provider.GetWeatherForecastAsync(latitude, longitude, units, language);
                     providerWeatherForecasts.Add(providerWeatherForecast);
                 }
                 catch (ResponseRetrievalException ex)
@@ -71,8 +72,10 @@ namespace WeatherForecast
             }
 
             avarageValues.Temperature = providerWeatherForecasts.Average(p => p.Temperature);
-            avarageValues.TemperatureMin = providerWeatherForecasts.Where(p => p.TemperatureMin.HasValue).Average(p => p.TemperatureMin);
-            avarageValues.TemperatureMax = providerWeatherForecasts.Where(p => p.TemperatureMax.HasValue).Average(p => p.TemperatureMax);
+            avarageValues.TemperatureMin = providerWeatherForecasts.Where(p => p.TemperatureMin.HasValue)
+                .Average(p => p.TemperatureMin);
+            avarageValues.TemperatureMax = providerWeatherForecasts.Where(p => p.TemperatureMax.HasValue)
+                .Average(p => p.TemperatureMax);
             avarageValues.Humidity = providerWeatherForecasts.Average(p => p.Humidity);
             avarageValues.WindSpeed = providerWeatherForecasts.Average(p => p.WindSpeed);
             avarageValues.Pressure = providerWeatherForecasts.Average(p => p.Pressure);

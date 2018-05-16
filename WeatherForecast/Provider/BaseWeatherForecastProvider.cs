@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using WeatherForecast.Exceptions;
 using WeatherForecast.Models;
 
@@ -19,7 +20,7 @@ namespace WeatherForecast.Provider
         public abstract string ServiceUri { get; }
 
         protected abstract Dictionary<UnitsSystem, string> UnitsSystemMappings { get; }
-        protected abstract Dictionary<Language, string> LanguageMappings { get; }
+        protected abstract List<LanguageMapping> LanguageMappings { get; }
 
         #endregion
 
@@ -37,7 +38,7 @@ namespace WeatherForecast.Provider
 
         #region Methods
 
-        protected async static Task<TResponse> GetResponseAsync<TResponse>(string url)
+        protected static async Task<TResponse> GetResponseAsync<TResponse>(string url)
             where TResponse : struct
         {
             using (var client = new HttpClient())
@@ -46,15 +47,12 @@ namespace WeatherForecast.Provider
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 var response = await client.GetAsync(url).ConfigureAwait(false);
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    var responseObject = JsonConvert.DeserializeObject<TResponse>(data);
-                    return responseObject;
-                }
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new ResponseRetrievalException("Request has failed.");
+                var data = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                var responseObject = JsonConvert.DeserializeObject<TResponse>(data);
+                return responseObject;
             }
-
-            throw new ResponseRetrievalException("Request has failed.");
         }
 
         protected string GetUnitsSystem(UnitsSystem units)
@@ -67,10 +65,12 @@ namespace WeatherForecast.Provider
 
         protected string GetLanguage(Language language)
         {
-            if (!LanguageMappings.TryGetValue(language, out string languageValue))
+            var languageMapping = LanguageMappings.FirstOrDefault(m => m.Language == language);
+
+            if (languageMapping == null)
                 throw new MappingNotFoundException($"Language is not found for {language}. Service: {ServiceUri}.");
 
-            return languageValue;
+            return languageMapping.Value;
         }
 
         #endregion
