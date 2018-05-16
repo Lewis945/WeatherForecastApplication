@@ -1,4 +1,4 @@
-﻿namespace WeatherForecast.Models
+﻿namespace WeatherForecast.Provider.DarkSky
 {
     public enum DarkSkyLanguage
     {
@@ -26,8 +26,8 @@
         Georgian,
         Korean,
         Cornish,
-        NorwegianBokmalNB,
-        NorwegianBokmalNO,
+        NorwegianBokmalNb,
+        NorwegianBokmalNo,
         Dutch,
         Polish,
         Portuguese,
