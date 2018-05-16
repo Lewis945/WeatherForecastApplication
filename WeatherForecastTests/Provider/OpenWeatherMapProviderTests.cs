@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using FluentAssertions;
 using WeatherForecast.Provider;
 using WeatherForecast.Provider.OpenWeatherMap;
 using Xunit;
@@ -8,12 +8,22 @@ namespace WeatherForecastTests.Provider
 {
     public class OpenWeatherMapProviderTests : BaseTest
     {
+        #region Fields
+
         private readonly IWeatherForecastProvider _provider;
+
+        #endregion
+
+        #region .ctor
 
         public OpenWeatherMapProviderTests()
         {
             _provider = new OpenWeatherMapProvider(Configuration.OpenWeatherMap);
         }
+
+        #endregion
+
+        #region Tests
 
         [Fact]
         public async Task Should_Not_Fail()
@@ -33,5 +43,7 @@ namespace WeatherForecastTests.Provider
             forecast.Pressure.Should().BeGreaterThan(0);
             forecast.Summary.Length.Should().BeGreaterThan(0);
         }
+
+        #endregion
     }
 }
